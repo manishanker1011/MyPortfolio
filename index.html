@@ -21,13 +21,15 @@
     --glow: rgba(127, 255, 178, 0.15);
   }
 
-  html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; width: 100%; overflow-x: hidden; }
+  img, svg, video { max-width: 100%; height: auto; }
 
   body {
     background: var(--bg);
     color: var(--text);
     font-family: 'DM Mono', monospace;
     overflow-x: hidden;
+    min-width: 320px;
     cursor: none;
   }
 
@@ -74,6 +76,7 @@
     z-index: 100;
     display: flex; align-items: center; justify-content: space-between;
     padding: 1.5rem 4rem;
+    -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
     background: rgba(10,10,15,0.7);
     border-bottom: 1px solid var(--border);
@@ -471,15 +474,124 @@
   .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
   .reveal.visible { opacity: 1; transform: translateY(0); }
 
-  @media (max-width: 768px) {
-    nav { padding: 1.2rem 1.5rem; }
+  /* ─── RESPONSIVE / CROSS-BROWSER FIXES ─── */
+  @media (max-width: 1100px) {
+    nav { padding: 1.25rem 2rem; }
+    .nav-links { gap: 1.4rem; }
+    #hero, #skills, #experience, #certifications, #contact { padding-left: 2rem; padding-right: 2rem; }
+    .hero-stats { right: 2rem; }
+    .contact-inner { gap: 3rem; }
+  }
+
+  @media (max-width: 900px) {
     .nav-links { display: none; }
-    #hero, #skills, #experience, #certifications, #contact { padding-left: 1.5rem; padding-right: 1.5rem; }
-    .hero-stats { right: 1.5rem; }
-    .exp-item { grid-template-columns: 1fr; gap: 1rem; }
-    .exp-item::before { display: none; }
+    .nav-status { font-size: 0.62rem; }
+    #hero { min-height: auto; padding-top: 8rem; padding-bottom: 4rem; justify-content: flex-start; }
+    .hero-bg-text { font-size: clamp(5rem, 28vw, 13rem); top: 44%; }
+    .hero-desc { max-width: 100%; }
+    .hero-stats {
+      position: relative; right: auto; bottom: auto;
+      display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0.9rem; width: 100%; margin-top: 3rem;
+    }
+    .stat { text-align: left; padding: 1rem; border: 1px solid var(--border); background: rgba(22,22,31,0.7); }
+    .stat-num { font-size: 2rem; }
     .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
-    footer { flex-direction: column; gap: 1rem; text-align: center; }
+    .modal-card { width: min(680px, calc(100vw - 2rem)); }
+  }
+
+  @media (max-width: 768px) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    nav {
+      padding: 1rem 1.1rem;
+      gap: 0.75rem;
+      align-items: center;
+      -webkit-backdrop-filter: blur(20px);
+      backdrop-filter: blur(20px);
+    }
+    .nav-logo { font-size: 1rem; }
+    .nav-status { max-width: 170px; line-height: 1.35; justify-content: flex-end; text-align: right; }
+    #hero, #skills, #experience, #certifications, #contact { padding-left: 1.1rem; padding-right: 1.1rem; }
+    #hero { padding-top: 7rem; padding-bottom: 3.5rem; }
+    .hero-tag { font-size: 0.62rem; line-height: 1.5; align-items: flex-start; }
+    .hero-tag::before { width: 26px; margin-top: 0.45rem; flex: 0 0 26px; }
+    .hero-name { font-size: clamp(3rem, 17vw, 5rem); word-break: normal; overflow-wrap: anywhere; }
+    .hero-desc { font-size: 0.82rem; line-height: 1.75; margin-bottom: 2rem; }
+    .hero-actions { flex-direction: column; align-items: stretch; gap: 0.9rem; width: 100%; }
+    .btn-primary, .btn-secondary { width: 100%; justify-content: center; padding: 0.95rem 1.2rem; min-height: 48px; }
+    .hero-stats { grid-template-columns: 1fr; margin-top: 2.25rem; }
+    .stat { text-align: left; }
+    .scroll-hint { display: none; }
+
+    #skills, #experience, #certifications, #contact { padding-top: 5rem; padding-bottom: 5rem; }
+    .section-header { gap: 0.9rem; margin-bottom: 2.5rem; align-items: flex-start; }
+    .section-title { font-size: clamp(2rem, 11vw, 3rem); }
+    .section-line { min-width: 48px; margin-top: 1.2rem; }
+    .skills-grid { grid-template-columns: 1fr; }
+    .skill-card { padding: 1.4rem; }
+
+    .exp-item { grid-template-columns: 1fr; gap: 1.3rem; padding: 2.25rem 0; }
+    .exp-item::before { display: none; }
+    .exp-title { font-size: 1.55rem; }
+    .exp-bullets li { font-size: 0.8rem; }
+    .exp-tags { gap: 0.4rem; }
+
+    .marquee-section { padding: 2rem 0; }
+    .marquee-item { padding: 0 1.25rem; gap: 1rem; font-size: 0.68rem; }
+
+    .cert-grid { grid-template-columns: 1fr; }
+    .cert-card { padding: 1.6rem; }
+
+    .contact-big { font-size: clamp(2.4rem, 13vw, 3.7rem); }
+    .contact-link { padding: 1.25rem 1rem; gap: 1rem; }
+    .contact-link:hover { padding-left: 1rem; }
+    .cl-value { font-size: 0.78rem; overflow-wrap: anywhere; }
+
+    .contact-modal {
+      align-items: flex-start;
+      overflow-y: auto;
+      padding: 1rem 0;
+    }
+    .modal-card {
+      width: calc(100vw - 1.2rem);
+      margin: 0.5rem auto;
+      padding: 1.35rem;
+      border-radius: 18px;
+      max-height: none;
+    }
+    .modal-close { top: 0.7rem; right: 0.85rem; }
+    .modal-title { font-size: 1.65rem; padding-right: 2rem; }
+    .modal-description { font-size: 0.82rem; margin-bottom: 1.3rem; }
+    .contact-form label { font-size: 0.72rem; margin-bottom: 1rem; }
+    .contact-form input, .contact-form textarea, .contact-form select {
+      font-size: 0.9rem;
+      padding: 0.9rem;
+      border-radius: 12px;
+    }
+    .contact-form textarea { min-height: 130px; }
+    .form-actions { flex-direction: column-reverse; align-items: stretch; gap: 0.75rem; }
+    .form-status { font-size: 0.78rem; line-height: 1.5; }
+
+    footer { padding: 1.5rem 1.1rem; flex-direction: column; gap: 0.75rem; text-align: center; line-height: 1.5; }
+  }
+
+  @media (max-width: 420px) {
+    nav { padding: 0.85rem 0.9rem; }
+    .nav-status { max-width: 135px; font-size: 0.56rem; }
+    .status-dot { width: 5px; height: 5px; flex: 0 0 5px; }
+    #hero, #skills, #experience, #certifications, #contact { padding-left: 0.9rem; padding-right: 0.9rem; }
+    .hero-name { font-size: clamp(2.7rem, 18vw, 4.4rem); }
+    .hero-bg-text { font-size: 31vw; }
+    .skill-items, .exp-tags { gap: 0.35rem; }
+    .skill-tag, .exp-tag { font-size: 0.62rem; }
+    .contact-link { align-items: flex-start; }
+    .modal-card { width: calc(100vw - 0.75rem); padding: 1.1rem; }
+  }
+
+  @media (hover: none), (pointer: coarse) {
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
   }
 </style>
 </head>
@@ -763,8 +875,11 @@
   <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
     <button class="modal-close" id="contactClose" aria-label="Close contact form">×</button>
     <h3 class="modal-title" id="modalTitle">Recruiter Contact Form</h3>
-    <p class="modal-description">Thank you for visiting. Please provide the recruiter’s details and role information to proceed. All fields are required.</p>
-    <form class="contact-form" id="contactForm">
+    <p class="modal-description">Thank you for visiting. Please provide your contact details and role information. The response will be sent to shankervuleche9@gmail.com. All fields are required.</p>
+    <form class="contact-form" id="contactForm" action="https://formsubmit.co/ajax/shankervuleche9@gmail.com" method="POST">
+      <input type="hidden" name="_subject" value="New Recruiter Contact From Portfolio" />
+      <input type="hidden" name="_template" value="table" />
+      <input type="hidden" name="_captcha" value="false" />
       <label>
         Phone number
         <input type="tel" name="phone" id="contactPhone" required pattern="[0-9+()\s\-]{7,}" placeholder="+1 555 123 4567" />
@@ -865,38 +980,32 @@
       return;
     }
 
-    const templateParams = {
-      phone: contactForm.phone.value.trim(),
-      email: contactForm.email.value.trim(),
-      roleType: contactForm.roleType.value,
-      message: contactForm.message.value.trim(),
-      subject: 'Recruiter Contact Details'
-    };
-
     formStatus.textContent = 'Sending your message…';
     formStatus.style.color = 'var(--text)';
 
+    const formData = new FormData(contactForm);
+    formData.append('Portfolio Owner Email', 'shankervuleche9@gmail.com');
+
     try {
-      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      const response = await fetch(contactForm.action, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Accept': 'application/json'
         },
-        body: JSON.stringify({
-          service_id: 'YOUR_SERVICE_ID',
-          template_id: 'YOUR_TEMPLATE_ID',
-          user_id: 'YOUR_PUBLIC_KEY',
-          template_params: templateParams
-        })
+        body: formData
       });
+
+      if (!response.ok) {
+        throw new Error('Form submission failed');
+      }
 
       formStatus.textContent = 'Message sent successfully. I will review recruiter details shortly.';
       formStatus.style.color = 'var(--accent2)';
       setTimeout(closeModal, 2400);
     } catch (error) {
-      formStatus.textContent = 'Unable to send message. Please try again later.';
+      formStatus.textContent = 'Unable to send message. Please email me directly at shankervuleche9@gmail.com.';
       formStatus.style.color = '#ff6b6b';
-      console.error('EmailJS send error:', error);
+      console.error('FormSubmit send error:', error);
     }
   });
 
