@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shanker Vuleche — Senior Java Full Stack Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --card: #16161f;
+    --border: #2a2a3a;
+    --accent: #7fffb2;
+    --accent2: #5ba8ff;
+    --accent3: #ff6b6b;
+    --text: #e8e8f0;
+    --muted: #7878a0;
+    --glow: rgba(127, 255, 178, 0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed; width: 10px; height: 10px;
+    background: var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    position: fixed; width: 36px; height: 36px;
+    border: 1px solid var(--accent); border-radius: 50%;
+    pointer-events: none; z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, opacity 0.3s;
+    opacity: 0.5;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 0; opacity: 0.4;
+  }
+
+  /* Grid background */
+  body::after {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: linear-gradient(rgba(127,255,178,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(127,255,178,0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.5rem 4rem;
+    backdrop-filter: blur(20px);
+    background: rgba(10,10,15,0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.1rem;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .nav-links { display: flex; gap: 2.5rem; list-style: none; }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: 0.75rem;
+    letter-spacing: 0.12em; text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-status {
+    display: flex; align-items: center; gap: 0.5rem;
+    font-size: 0.7rem; color: var(--muted); letter-spacing: 0.08em;
+  }
+  .status-dot {
+    width: 6px; height: 6px; background: var(--accent);
+    border-radius: 50%; animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;box-shadow:0 0 0 0 var(--glow)} 50%{opacity:.6;box-shadow:0 0 0 6px transparent} }
+
+  /* ─── HERO ─── */
+  #hero {
+    position: relative; min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 0 4rem 6rem;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .hero-bg-text {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: clamp(6rem, 18vw, 18rem);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(127,255,178,0.06);
+    white-space: nowrap; pointer-events: none; user-select: none;
+    letter-spacing: -0.05em; z-index: 0;
+  }
+
+  .hero-tag {
+    font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1.5rem;
+    display: flex; align-items: center; gap: 1rem;
+    opacity: 0; animation: fadeUp 0.8s 0.2s ease forwards;
+  }
+  .hero-tag::before { content: ''; display: block; width: 40px; height: 1px; background: var(--accent); }
+
+  .hero-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(3.5rem, 8vw, 7.5rem);
+    line-height: 0.95; letter-spacing: -0.03em;
+    margin-bottom: 1.5rem;
+    opacity: 0; animation: fadeUp 0.8s 0.4s ease forwards;
+  }
+  .hero-name em { font-style: italic; color: var(--accent); }
+
+  .hero-desc {
+    max-width: 600px; font-size: 0.9rem; line-height: 1.7;
+    color: var(--muted); margin-bottom: 3rem;
+    opacity: 0; animation: fadeUp 0.8s 0.6s ease forwards;
+  }
+
+  .hero-actions {
+    display: flex; gap: 1.5rem; align-items: center;
+    opacity: 0; animation: fadeUp 0.8s 0.8s ease forwards;
+  }
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    background: var(--accent); color: #0a0a0f;
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.9rem 2rem; text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: all 0.3s;
+  }
+  .btn-primary:hover { background: #5ba8ff; transform: translateY(-2px); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 0.6rem;
+    border: 1px solid rgba(127,255,178,0.22);
+    background: rgba(127,255,178,0.08);
+    color: #e8e8f0;
+    font-family: 'DM Mono', monospace; font-size: 0.75rem;
+    letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 0.9rem 2rem; text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  .btn-secondary:hover {
+    border-color: var(--accent);
+    background: rgba(127,255,178,0.15);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .hero-stats {
+    position: absolute; right: 4rem; bottom: 6rem;
+    display: flex; flex-direction: column; gap: 2rem;
+    opacity: 0; animation: fadeUp 0.8s 1s ease forwards;
+  }
+  .stat { text-align: right; }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 2.5rem; line-height: 1; color: var(--accent);
+  }
+  .stat-label { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+
+  .scroll-hint {
+    position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+    display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+    font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted);
+    opacity: 0; animation: fadeUp 1s 1.4s ease forwards;
+  }
+  .scroll-line { width: 1px; height: 60px; background: linear-gradient(to bottom, var(--muted), transparent); animation: scrollDown 2s infinite; }
+  @keyframes scrollDown { 0%{transform:scaleY(0);transform-origin:top} 50%{transform:scaleY(1);transform-origin:top} 100%{transform:scaleY(0);transform-origin:bottom} }
+
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ─── SECTIONS ─── */
+  section { position: relative; z-index: 1; }
+
+  .section-header {
+    display: flex; align-items: center; gap: 1.5rem;
+    margin-bottom: 4rem;
+  }
+  .section-num {
+    font-family: 'DM Mono', monospace; font-size: 0.7rem;
+    color: var(--accent); letter-spacing: 0.1em;
+  }
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1;
+  }
+  .section-line { flex: 1; height: 1px; background: var(--border); }
+
+  /* ─── SKILLS ─── */
+  #skills { padding: 8rem 4rem; }
+
+  .skills-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5px; background: var(--border);
+    border: 1px solid var(--border);
+  }
+  .skill-card {
+    background: var(--card); padding: 2rem;
+    transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .skill-card:hover { background: var(--surface); }
+  .skill-card::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--accent);
+    transition: height 0.4s;
+  }
+  .skill-card:hover::before { height: 100%; }
+  .skill-cat {
+    font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--accent); margin-bottom: 1rem;
+  }
+  .skill-items {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .skill-tag {
+    font-size: 0.7rem; padding: 0.3rem 0.7rem;
+    border: 1px solid var(--border); color: var(--muted);
+    transition: all 0.2s;
+  }
+  .skill-card:hover .skill-tag { border-color: rgba(127,255,178,0.3); color: var(--text); }
+
+  /* ─── EXPERIENCE ─── */
+  #experience { padding: 8rem 4rem; }
+
+  .exp-list { display: flex; flex-direction: column; gap: 0; }
+  .exp-item {
+    display: grid; grid-template-columns: 200px 1fr;
+    gap: 3rem; padding: 3rem 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+    transition: all 0.3s;
+  }
+  .exp-item:last-child { border-bottom: 1px solid var(--border); }
+  .exp-item::before {
+    content: ''; position: absolute; left: -4rem; top: 3rem;
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--border);
+    transition: background 0.3s, box-shadow 0.3s;
+  }
+  .exp-item:hover::before {
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(127,255,178,0.2);
+  }
+
+  .exp-left { padding-top: 0.2rem; }
+  .exp-period {
+    font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .exp-company {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1rem; color: var(--accent);
+  }
+  .exp-location { font-size: 0.65rem; color: var(--muted); margin-top: 0.3rem; }
+
+  .exp-right {}
+  .exp-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.8rem; margin-bottom: 1.2rem;
+    line-height: 1.1;
+  }
+  .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: 0.7rem; }
+  .exp-bullets li {
+    font-size: 0.82rem; color: var(--muted); line-height: 1.6;
+    padding-left: 1rem; position: relative;
+  }
+  .exp-bullets li::before {
+    content: '→'; position: absolute; left: 0;
+    color: var(--accent); font-size: 0.7rem;
+  }
+  .exp-item:hover .exp-bullets li { color: var(--text); }
+  .exp-tags {
+    display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1.5rem;
+  }
+  .exp-tag {
+    font-size: 0.65rem; padding: 0.25rem 0.6rem;
+    background: rgba(127,255,178,0.06);
+    border: 1px solid rgba(127,255,178,0.2);
+    color: var(--accent); letter-spacing: 0.08em;
+  }
+
+  /* ─── TECH MARQUEE ─── */
+  .marquee-section {
+    padding: 3rem 0;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    overflow: hidden; z-index: 1; position: relative;
+  }
+  .marquee-track {
+    display: flex; gap: 0;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  @keyframes marquee { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+  .marquee-item {
+    display: flex; align-items: center; gap: 2rem;
+    padding: 0 2.5rem; white-space: nowrap;
+    font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase;
+    color: var(--muted);
+  }
+  .marquee-dot { width: 4px; height: 4px; background: var(--accent); border-radius: 50%; }
+
+  /* ─── CERTIFICATIONS ─── */
+  #certifications { padding: 8rem 4rem; }
+  .cert-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1px; background: var(--border); border: 1px solid var(--border); }
+  .cert-card {
+    background: var(--card); padding: 2.5rem;
+    display: flex; flex-direction: column; gap: 1rem;
+    transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+  .cert-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(to right, var(--accent), var(--accent2));
+    transform: scaleX(0); transition: transform 0.4s;
+  }
+  .cert-card:hover { background: var(--surface); }
+  .cert-card:hover::after { transform: scaleX(1); }
+  .cert-icon { font-size: 2rem; }
+  .cert-title {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    font-size: 1.1rem; line-height: 1.3;
+  }
+  .cert-org { font-size: 0.72rem; color: var(--accent); letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* ─── CONTACT ─── */
+  #contact { padding: 8rem 4rem; }
+  .contact-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 6rem; align-items: center;
+  }
+  .contact-left {}
+  .contact-big {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    line-height: 0.95; letter-spacing: -0.02em;
+    margin-bottom: 1.5rem;
+  }
+  .contact-big em { font-style: italic; color: var(--accent); }
+  .contact-sub { font-size: 0.85rem; color: var(--muted); line-height: 1.7; }
+
+  .contact-links {
+    display: flex; flex-direction: column; gap: 1px;
+    background: var(--border); border: 1px solid var(--border);
+  }
+  .contact-link {
+    background: var(--card); padding: 1.5rem 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    text-decoration: none; color: var(--text);
+    transition: all 0.3s; group: true;
+  }
+  .contact-link:hover { background: var(--surface); padding-left: 2.5rem; }
+  .contact-link:hover .cl-arrow { color: var(--accent); transform: translateX(4px); }
+  .cl-left { display: flex; flex-direction: column; gap: 0.3rem; }
+  .cl-type { font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+  .cl-value { font-size: 0.85rem; }
+  .cl-arrow { font-size: 1.2rem; color: var(--muted); transition: all 0.3s; }
+
+  .contact-modal {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgba(10, 10, 15, 0.75); opacity: 0; visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+    z-index: 1000;
+  }
+  .contact-modal.open { opacity: 1; visibility: visible; }
+  .modal-backdrop {
+    position: absolute; inset: 0; background: rgba(10, 10, 15, 0.85);
+  }
+  .modal-card {
+    position: relative; width: min(640px, calc(100% - 3rem));
+    background: linear-gradient(145deg, rgba(17,17,24,0.98), rgba(24,24,36,0.98));
+    border: 1px solid rgba(127,255,178,0.12);
+    box-shadow: 0 32px 90px rgba(0,0,0,0.4);
+    border-radius: 24px; padding: 2.5rem; z-index: 1;
+  }
+  .modal-close {
+    position: absolute; top: 1rem; right: 1rem;
+    background: transparent; border: none; color: var(--muted);
+    font-size: 1.8rem; cursor: pointer;
+  }
+  .modal-close:hover { color: var(--accent); }
+  .modal-title {
+    font-family: 'DM Serif Display', serif; font-size: 2rem; margin-bottom: 0.5rem;
+    color: var(--text);
+  }
+  .modal-description { font-size: 0.95rem; color: var(--muted); margin-bottom: 1.8rem; line-height: 1.7; }
+  .contact-form label {
+    display: grid; gap: 0.55rem; margin-bottom: 1.25rem;
+    font-size: 0.8rem; color: var(--muted);
+  }
+  .contact-form input,
+  .contact-form textarea,
+  .contact-form select {
+    width: 100%; padding: 1rem 1.1rem;
+    border: 1px solid rgba(127,255,178,0.12); border-radius: 14px;
+    background: rgba(10,10,15,0.9); color: var(--text);
+    font-family: 'DM Mono', monospace; font-size: 0.95rem;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .contact-form input:focus,
+  .contact-form textarea:focus,
+  .contact-form select:focus {
+    outline: none; border-color: var(--accent); box-shadow: 0 0 0 4px rgba(127,255,178,0.08);
+  }
+  .contact-form textarea { min-height: 160px; resize: vertical; }
+  .form-actions {
+    display: flex; justify-content: flex-end; gap: 1rem; margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .form-note {
+    margin-top: 1rem; color: var(--accent); font-size: 0.82rem; opacity: 0.85;
+  }
+  .form-status {
+    margin-top: 1rem; font-size: 0.9rem; color: var(--accent); min-height: 1.1rem;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    padding: 2rem 4rem;
+    border-top: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    font-size: 0.65rem; color: var(--muted); letter-spacing: 0.1em;
+    position: relative; z-index: 1;
+  }
+
+  /* ─── FLOATING DECORATION ─── */
+  .glow-orb {
+    position: fixed; border-radius: 50%;
+    filter: blur(80px); pointer-events: none; z-index: 0;
+    opacity: 0.12;
+  }
+  .orb-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; right: -100px; }
+  .orb-2 { width: 300px; height: 300px; background: var(--accent2); bottom: 20%; left: -100px; }
+
+  /* ─── SCROLL REVEAL ─── */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.8s ease, transform 0.8s ease; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  @media (max-width: 768px) {
+    nav { padding: 1.2rem 1.5rem; }
+    .nav-links { display: none; }
+    #hero, #skills, #experience, #certifications, #contact { padding-left: 1.5rem; padding-right: 1.5rem; }
+    .hero-stats { right: 1.5rem; }
+    .exp-item { grid-template-columns: 1fr; gap: 1rem; }
+    .exp-item::before { display: none; }
+    .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+    footer { flex-direction: column; gap: 1rem; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<div class="glow-orb orb-1"></div>
+<div class="glow-orb orb-2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#hero" class="nav-logo">SV</a>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#certifications">Certifications</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-status">
+    <span class="status-dot"></span>
+    Available for opportunities
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-text">JAVA</div>
+  <div class="hero-tag">Senior Full Stack Developer · 7 Years Experience</div>
+  <h1 class="hero-name">Shanker<br><em>Vuleche</em></h1>
+  <p class="hero-desc">Designing and deploying scalable enterprise applications across Banking and Telecom domains — using Java, Spring Boot, Microservices, React, Angular, Kafka, and AWS.</p>
+  <div class="hero-actions">
+    <a href="#experience" class="btn-primary">↓ View Experience</a>
+    <button class="btn-secondary" id="openContactButton" type="button">✉ Get In Touch</button>
+  </div>
+  <div class="hero-stats">
+    <div class="stat">
+      <div class="stat-num">7+</div>
+      <div class="stat-label">Years Experience</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Companies</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num">2</div>
+      <div class="stat-label">Domains</div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <div class="scroll-line"></div>
+    Scroll
+  </div>
+</section>
+
+<!-- TECH MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track" id="marqueeTrack"></div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-header reveal">
+    <span class="section-num">01</span>
+    <h2 class="section-title">Technical Skills</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="skills-grid reveal">
+    <div class="skill-card">
+      <div class="skill-cat">Languages</div>
+      <div class="skill-items">
+        <span class="skill-tag">Java 8/11/17</span><span class="skill-tag">JavaScript</span><span class="skill-tag">TypeScript</span><span class="skill-tag">SQL</span><span class="skill-tag">PL/SQL</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Backend</div>
+      <div class="skill-items">
+        <span class="skill-tag">Spring Boot</span><span class="skill-tag">Spring MVC</span><span class="skill-tag">Spring Security</span><span class="skill-tag">Spring Cloud</span><span class="skill-tag">Hibernate</span><span class="skill-tag">REST APIs</span><span class="skill-tag">Microservices</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Frontend</div>
+      <div class="skill-items">
+        <span class="skill-tag">React JS</span><span class="skill-tag">Angular</span><span class="skill-tag">Redux</span><span class="skill-tag">RxJS</span><span class="skill-tag">Axios</span><span class="skill-tag">HTML5</span><span class="skill-tag">CSS3</span><span class="skill-tag">Bootstrap</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">API Management</div>
+      <div class="skill-items">
+        <span class="skill-tag">APIGEE Edge</span><span class="skill-tag">APIGEE X</span><span class="skill-tag">APIGEE Hybrid</span><span class="skill-tag">API Proxies</span><span class="skill-tag">Shared Flows</span><span class="skill-tag">OAuth2</span><span class="skill-tag">JWT</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Messaging & Events</div>
+      <div class="skill-items">
+        <span class="skill-tag">Apache Kafka</span><span class="skill-tag">Kafka Streams</span><span class="skill-tag">Event-Driven</span><span class="skill-tag">DLQ</span><span class="skill-tag">Retry Patterns</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Cloud & DevOps</div>
+      <div class="skill-items">
+        <span class="skill-tag">AWS EC2</span><span class="skill-tag">AWS EKS</span><span class="skill-tag">AWS S3</span><span class="skill-tag">Docker</span><span class="skill-tag">Kubernetes</span><span class="skill-tag">Jenkins</span><span class="skill-tag">GitHub Actions</span><span class="skill-tag">Helm</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Databases</div>
+      <div class="skill-items">
+        <span class="skill-tag">PostgreSQL</span><span class="skill-tag">Oracle</span><span class="skill-tag">MySQL</span><span class="skill-tag">MongoDB</span><span class="skill-tag">Redis</span><span class="skill-tag">SQL Server</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Monitoring</div>
+      <div class="skill-items">
+        <span class="skill-tag">Prometheus</span><span class="skill-tag">Grafana</span><span class="skill-tag">Splunk</span><span class="skill-tag">ELK Stack</span><span class="skill-tag">CloudWatch</span><span class="skill-tag">Log4j</span>
+      </div>
+    </div>
+    <div class="skill-card">
+      <div class="skill-cat">Architecture</div>
+      <div class="skill-items">
+        <span class="skill-tag">Microservices</span><span class="skill-tag">Saga Pattern</span><span class="skill-tag">Circuit Breaker</span><span class="skill-tag">Bulkhead</span><span class="skill-tag">Distributed Systems</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-header reveal">
+    <span class="section-num">02</span>
+    <h2 class="section-title">Experience</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="exp-list">
+
+    <div class="exp-item reveal">
+      <div class="exp-left">
+        <div class="exp-period">Jul 2024 – Present</div>
+        <div class="exp-company">Fifth Third Bank</div>
+        <div class="exp-location">USA</div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-title">Senior Java Full Stack Developer</div>
+        <ul class="exp-bullets">
+          <li>Modernized legacy banking workflows into Java 17 and Spring Boot microservices across customer onboarding, account opening, fund transfer, loan processing, and profile management platforms.</li>
+          <li>Built APIGEE Edge/X-managed API proxies with OAuth2/JWT validation, rate limiting, spike arrest, and quota policies — strengthening API governance and traffic control.</li>
+          <li>Engineered Kafka-based event-driven workflows for fund transfers, transaction notifications, and credit verification, reducing service-to-service coupling.</li>
+          <li>Containerized microservices using Docker, deployed on Kubernetes and AWS EKS with blue-green deployments and high availability.</li>
+          <li>Built CI/CD pipelines using Jenkins, GitHub Actions, Maven, and SonarQube, improving code quality and deployment efficiency.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Java 17</span><span class="exp-tag">Spring Boot</span><span class="exp-tag">APIGEE</span><span class="exp-tag">Kafka</span><span class="exp-tag">React JS</span><span class="exp-tag">Angular</span><span class="exp-tag">AWS EKS</span><span class="exp-tag">Redis</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-left">
+        <div class="exp-period">Feb 2023 – May 2024</div>
+        <div class="exp-company">Charter Communications</div>
+        <div class="exp-location">USA</div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-title">Java Full Stack Developer</div>
+        <ul class="exp-bullets">
+          <li>Migrated legacy telecom platforms from monolithic architecture to Spring Boot microservices, reducing release cycle time by approximately 35%.</li>
+          <li>Implemented APIGEE Edge/X/Hybrid for API proxy configuration, OAuth2 policies, JWT validation, quota enforcement, and analytics.</li>
+          <li>Built Kafka-based asynchronous integrations between provisioning, billing, and customer services, reducing dependency on synchronous REST calls.</li>
+          <li>Resolved production incidents involving Kafka event failures, API latency, and database bottlenecks, maintaining 99.9% application availability during migration.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Java</span><span class="exp-tag">Spring Boot</span><span class="exp-tag">APIGEE</span><span class="exp-tag">Kafka</span><span class="exp-tag">React JS</span><span class="exp-tag">PostgreSQL</span><span class="exp-tag">Docker</span><span class="exp-tag">Kubernetes</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-left">
+        <div class="exp-period">Jan 2021 – Dec 2022</div>
+        <div class="exp-company">Cognizant Technology Solutions</div>
+        <div class="exp-location">India</div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-title">Programmer Analyst</div>
+        <ul class="exp-bullets">
+          <li>Developed and maintained Java and Spring Boot microservices supporting telecom customer management, billing operations, and service requests.</li>
+          <li>Implemented Kafka producers and consumers for asynchronous event processing of customer notifications, billing updates, and provisioning events.</li>
+          <li>Implemented Redis caching for frequently accessed customer and configuration data, reducing repetitive database calls and improving API response time.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Java</span><span class="exp-tag">Spring Boot</span><span class="exp-tag">Kafka</span><span class="exp-tag">React JS</span><span class="exp-tag">Angular</span><span class="exp-tag">Redis</span><span class="exp-tag">Jenkins</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-left">
+        <div class="exp-period">Jun 2019 – Dec 2020</div>
+        <div class="exp-company">Vodafone</div>
+        <div class="exp-location">India</div>
+      </div>
+      <div class="exp-right">
+        <div class="exp-title">Associate Software Engineer</div>
+        <ul class="exp-bullets">
+          <li>Developed Spring Boot-based microservices supporting telecom billing lifecycle, customer profiles, service plan management, and payment history.</li>
+          <li>Automated document and log archival workflows using AWS S3 and Lambda triggers, improving storage lifecycle management.</li>
+          <li>Implemented Kafka-based asynchronous messaging for billing alerts and notification events across distributed services.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="exp-tag">Java</span><span class="exp-tag">Spring Boot</span><span class="exp-tag">Kafka</span><span class="exp-tag">Angular JS</span><span class="exp-tag">MySQL</span><span class="exp-tag">AWS S3</span><span class="exp-tag">Lambda</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-header reveal">
+    <span class="section-num">03</span>
+    <h2 class="section-title">Certifications</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="cert-grid reveal">
+    <div class="cert-card">
+      <div class="cert-icon">☕</div>
+      <div class="cert-title">Oracle Certified Associate – Java Fundamentals</div>
+      <div class="cert-org">Oracle Corporation</div>
+    </div>
+    <div class="cert-card">
+      <div class="cert-icon">🗄️</div>
+      <div class="cert-title">MySQL Certification</div>
+      <div class="cert-org">IIT India</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-inner reveal">
+    <div class="contact-left">
+      <h2 class="contact-big">Let's build something <em>great</em></h2>
+      <p class="contact-sub">Open to senior engineering roles across Banking, Fintech, and Telecom domains. Based in Frisco, TX — open to remote and hybrid opportunities across the US.</p>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:shankervuleche9@gmail.com" class="contact-link">
+        <div class="cl-left">
+          <span class="cl-type">Email</span>
+          <span class="cl-value">shankervuleche9@gmail.com</span>
+        </div>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="tel:9406292780" class="contact-link">
+        <div class="cl-left">
+          <span class="cl-type">Phone</span>
+          <span class="cl-value">940-629-2780</span>
+        </div>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="https://www.linkedin.com/in/shanker-vuleche-c75738747/" target="_blank" class="contact-link">
+        <div class="cl-left">
+          <span class="cl-type">LinkedIn</span>
+          <span class="cl-value">shanker-vuleche</span>
+        </div>
+        <span class="cl-arrow">→</span>
+      </a>
+      <a href="#" class="contact-link">
+        <div class="cl-left">
+          <span class="cl-type">Location</span>
+          <span class="cl-value">Frisco, TX — USA</span>
+        </div>
+        <span class="cl-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<div class="contact-modal" id="contactModal" aria-hidden="true">
+  <div class="modal-backdrop" id="contactBackdrop"></div>
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <button class="modal-close" id="contactClose" aria-label="Close contact form">×</button>
+    <h3 class="modal-title" id="modalTitle">Recruiter Contact Form</h3>
+    <p class="modal-description">Thank you for visiting. Please provide the recruiter’s details and role information to proceed. All fields are required.</p>
+    <form class="contact-form" id="contactForm">
+      <label>
+        Phone number
+        <input type="tel" name="phone" id="contactPhone" required pattern="[0-9+()\s\-]{7,}" placeholder="+1 555 123 4567" />
+      </label>
+      <label>
+        Email address
+        <input type="email" name="email" id="contactEmail" required placeholder="recruiter@example.com" />
+      </label>
+      <label>
+        Role type
+        <select name="roleType" id="contactRoleType" required>
+          <option value="">Select role type</option>
+          <option value="Full Time">Full Time</option>
+          <option value="Contract">Contract</option>
+          <option value="C2H">C2H</option>
+          <option value="W2">W2</option>
+        </select>
+      </label>
+      <label>
+        Description
+        <textarea name="message" id="contactMessage" required minlength="20" placeholder="Enter role summary, company, location and hiring timeline."></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" id="contactCancel">Cancel</button>
+        <button type="submit" class="btn-primary">Submit</button>
+      </div>
+      <div class="form-status" id="formStatus">All fields are mandatory.</div>
+    </form>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <span>© 2025 Shanker Vuleche</span>
+  <span>Senior Java Full Stack Developer · Frisco, TX</span>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top = e.clientY + 'px';
+    setTimeout(() => {
+      ring.style.left = e.clientX + 'px';
+      ring.style.top = e.clientY + 'px';
+    }, 80);
+  });
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.width = '20px'; cursor.style.height = '20px';
+      ring.style.width = '60px'; ring.style.height = '60px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.width = '10px'; cursor.style.height = '10px';
+      ring.style.width = '36px'; ring.style.height = '36px';
+    });
+  });
+
+  const contactModal = document.getElementById('contactModal');
+  const openContactButton = document.getElementById('openContactButton');
+  const contactClose = document.getElementById('contactClose');
+  const contactCancel = document.getElementById('contactCancel');
+  const contactBackdrop = document.getElementById('contactBackdrop');
+  const contactForm = document.getElementById('contactForm');
+  const formStatus = document.getElementById('formStatus');
+
+  const openModal = () => {
+    contactModal.classList.add('open');
+    contactModal.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+    document.getElementById('contactPhone').focus();
+  };
+  const closeModal = () => {
+    contactModal.classList.remove('open');
+    contactModal.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    formStatus.textContent = 'All fields are mandatory.';
+    formStatus.style.color = 'var(--accent)';
+    contactForm.reset();
+  };
+
+  openContactButton.addEventListener('click', openModal);
+  contactClose.addEventListener('click', closeModal);
+  contactCancel.addEventListener('click', closeModal);
+  contactBackdrop.addEventListener('click', closeModal);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && contactModal.classList.contains('open')) {
+      closeModal();
+    }
+  });
+
+  contactForm.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (!contactForm.checkValidity()) {
+      contactForm.reportValidity();
+      return;
+    }
+
+    const templateParams = {
+      phone: contactForm.phone.value.trim(),
+      email: contactForm.email.value.trim(),
+      roleType: contactForm.roleType.value,
+      message: contactForm.message.value.trim(),
+      subject: 'Recruiter Contact Details'
+    };
+
+    formStatus.textContent = 'Sending your message…';
+    formStatus.style.color = 'var(--text)';
+
+    try {
+      await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          service_id: 'YOUR_SERVICE_ID',
+          template_id: 'YOUR_TEMPLATE_ID',
+          user_id: 'YOUR_PUBLIC_KEY',
+          template_params: templateParams
+        })
+      });
+
+      formStatus.textContent = 'Message sent successfully. I will review recruiter details shortly.';
+      formStatus.style.color = 'var(--accent2)';
+      setTimeout(closeModal, 2400);
+    } catch (error) {
+      formStatus.textContent = 'Unable to send message. Please try again later.';
+      formStatus.style.color = '#ff6b6b';
+      console.error('EmailJS send error:', error);
+    }
+  });
+
+  // Marquee
+  const techs = [
+    'Java 17','Spring Boot','Microservices','React JS','Angular','Kafka',
+    'APIGEE','AWS EKS','Docker','Kubernetes','OAuth2','JWT','Redis',
+    'PostgreSQL','MongoDB','Jenkins','GitHub Actions','Prometheus','Grafana',
+    'ELK Stack','Spring Security','Hibernate','TypeScript','REST APIs'
+  ];
+  const track = document.getElementById('marqueeTrack');
+  const doubled = [...techs, ...techs];
+  doubled.forEach(t => {
+    const item = document.createElement('div');
+    item.className = 'marquee-item';
+    item.innerHTML = `<span class="marquee-dot"></span>${t}`;
+    track.appendChild(item);
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('visible'); }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+  // Orb parallax
+  const orb1 = document.querySelector('.orb-1');
+  const orb2 = document.querySelector('.orb-2');
+  document.addEventListener('mousemove', e => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 30;
+    const y = (e.clientY / window.innerHeight - 0.5) * 30;
+    orb1.style.transform = `translate(${x}px, ${y}px)`;
+    orb2.style.transform = `translate(${-x}px, ${-y}px)`;
+  });
+</script>
+</body>
+</html>
